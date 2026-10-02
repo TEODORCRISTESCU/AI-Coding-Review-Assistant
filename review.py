@@ -1,6 +1,8 @@
 import subprocess
 import json
 
+from ai_test import ai_review
+
 def review_code(code) -> dict:
 
     res = {
@@ -36,9 +38,9 @@ def review_code(code) -> dict:
 
     return res
 
-def read_diff():
+def read_diff(filename):
     result = subprocess.run(
-    ["git", "diff"],
+    ["git", "diff", "--", filename],
     text=True,
     capture_output=True
 )
@@ -47,5 +49,6 @@ def read_diff():
 
 print("AI Code Reviewer starting...\n Waiting for pull request...\n")
 
-diff = read_diff()
-print(json.dumps(review_code(diff), indent = 2))
+diff = read_diff("sample.py")
+result = ai_review(diff)
+print(json.dumps(result, indent = 2))

@@ -1,3 +1,3 @@
-name = "Alice"
-password = "very secret"
+name = "Matei"
+password = "super secret"
 # TODO: improve authentication
