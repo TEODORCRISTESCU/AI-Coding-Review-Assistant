@@ -3,7 +3,7 @@ import json
 from dotenv import load_dotenv
 from openai import OpenAI
 
-from .models import Review
+from reviewer.models import Review
 
 
 load_dotenv()
