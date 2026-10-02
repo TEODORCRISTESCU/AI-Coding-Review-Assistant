@@ -1,3 +1,3 @@
-name = "Alice"
-password = "secret"
-# TODO: improve authentication
+name = "Matei"
+password = "something"
+# TODO: improve auth

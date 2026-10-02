@@ -1,4 +1,5 @@
 import subprocess
+import json
 
 def review_code(code) -> dict:
 
@@ -47,4 +48,4 @@ def read_diff():
 print("AI Code Reviewer starting...\n Waiting for pull request...\n")
 
 diff = read_diff()
-print(review_code(diff))
+print(json.dumps(review_code(diff), indent = 2))
