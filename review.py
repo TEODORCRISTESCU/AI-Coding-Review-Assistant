@@ -8,30 +8,32 @@ def review_code(code) -> dict:
 
     print("Reviewing code\n")
 
+    lines = code.splitlines()
 
-    if "password" in code:
-        password = {}
+    for line_number, line in enumerate(lines, start=1):
+        if not line.startswith("+") or line.startswith("+++"):
+            continue
 
-        password["severity"] = "high"
-        password["message"] = "Warning: possible password exposure"
+        changed_line = line[1:]
+        if "password" in changed_line:
+            password = {}
 
-        res["findings"].append(password)
+            password["severity"] = "high"
+            password["message"] = "Warning: possible password exposure"
+            password["line"] = line_number
+
+            res["findings"].append(password)
     
-    if "TODO" in code:
-        TODO = {}
+        if "TODO" in changed_line:
+            TODO = {}
 
-        TODO["severity"] = "low"
-        TODO["message"] = "TODO comment found"
+            TODO["severity"] = "low"
+            TODO["message"] = "TODO comment found"
+            TODO["line"] = line_number
 
-        res["findings"].append(TODO)
+            res["findings"].append(TODO)
 
     return res
-
-def read_code(filename):
-    with open(filename, "r") as f:
-        content = f.read()
-    
-        return content
 
 def read_diff():
     result = subprocess.run(
