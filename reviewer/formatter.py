@@ -10,9 +10,11 @@ def format_review(review: Review) -> str:
     ]
 
     for i, finding in enumerate(review.findings, start=1):
-        lines.append(f"""### Finding {i} \n 
-                        Severity :{finding.severity}\n
-                        Message: {finding.message}\n
-                        line : {finding.line} \n""")
+        lines.append(f"### Finding {i}")
+        lines.append("")
+        lines.append(f"**Severity:** {finding.severity.upper()}")
+        lines.append(f"**Message:** {finding.message}")
+        lines.append(f"**Line:** {finding.line}")
+        lines.append("")
 
     return "\n".join(lines)
