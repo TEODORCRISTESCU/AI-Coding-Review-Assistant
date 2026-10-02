@@ -1,10 +1,12 @@
 import subprocess
 
+from reviewer.formatter import format_review
+from reviewer.github import post_comment
 from .ai_review import ai_review
 
 def read_diff(filename):
     result = subprocess.run(
-        ["git", "diff", "--", filename],
+        ["git", "diff", "main...HEAD", "--", filename],
         text=True,
         capture_output=True
     )
@@ -14,12 +16,14 @@ def read_diff(filename):
 
 print("AI Code Reviewer starting...\n Waiting for pull request...\n")
 
-diff = read_diff("sample.py")
-print(f"{diff}\n")
-review = ai_review(diff)
-print(review.summary)
+diff = read_diff("reviewer/sample.py")
 
-for finding in review.findings:
-    print(finding.severity)
-    print(finding.message)
-    print(finding.line)
+if diff:
+    review = ai_review(diff)
+    formatted_review = format_review(review)
+    print(formatted_review)
+    post_comment("Test comment from my AI reviewer.")
+
+else:
+    print("No changes found")
+
