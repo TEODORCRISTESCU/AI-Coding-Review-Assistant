@@ -1,4 +1,4 @@
 name = "Alice"
-# TODO: something
+# TODO: something else
 
-password = "secret"
+password = "very secret"
