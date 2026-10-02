@@ -5,7 +5,9 @@ on:
     types: [opened, synchronize, reopened]
 
 permissions:
+  contents: read
   issues: write
+
 
 
 jobs:
@@ -33,6 +35,6 @@ jobs:
         run: python -m reviewer.main
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN}}
-          GITHUB_REPOSITORY: ${{ github.repository}}
-          PR_NUMBER: ${{github.event.pull_request.number}}
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}

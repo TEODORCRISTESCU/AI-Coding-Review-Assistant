@@ -22,7 +22,7 @@ if diff:
     review = ai_review(diff)
     formatted_review = format_review(review)
     print(formatted_review)
-    post_comment("Test comment from my AI reviewer.")
+    post_comment(formatted_review)
 
 else:
     print("No changes found")
