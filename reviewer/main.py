@@ -2,7 +2,6 @@ import subprocess
 
 from .ai_review import ai_review
 
-
 def read_diff(filename):
     result = subprocess.run(
         ["git", "diff", "--", filename],
