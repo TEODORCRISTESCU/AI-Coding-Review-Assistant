@@ -6,7 +6,7 @@ from .ai_review import ai_review
 
 def read_diff(filename):
     result = subprocess.run(
-        ["git", "diff", "main...HEAD", "--", filename],
+        ["git", "diff", "origin/main...HEAD", "--", filename],
         text=True,
         capture_output=True
     )
@@ -26,4 +26,3 @@ if diff:
 
 else:
     print("No changes found")
-
