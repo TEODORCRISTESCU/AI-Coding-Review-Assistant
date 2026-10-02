@@ -26,7 +26,5 @@ def post_comment(markdown: str) -> None:
         headers=headers,
         json=payload,
     )
-
-    print("GitHub status:", response.status_code)
-    print("GitHub response:", response.text)
+    
     response.raise_for_status()
