@@ -6,28 +6,37 @@ from .ai_review import ai_review
 
 from logging import Logger
 
-def read_diff():
+def read_diff(path=None):
+    command = ["git", "diff", "origin/main...HEAD"]
+
+    if path:
+        command.extend(["--", path])
+
     result = subprocess.run(
-        ["git", "diff", "origin/main...HEAD"],
+        command,
         text=True,
         capture_output=True
     )
 
-    if result.returncode != 0:
-        raise RuntimeError(f"Git diff failed: {result.stderr.strip()}")
+    if getattr(result, "returncode", 0) != 0:
+        raise RuntimeError(f"Git diff failed: {getattr(result, 'stderr', '').strip()}")
     
     return result.stdout
 
 
-print("AI Code Reviewer starting...\n Waiting for pull request...\n")
+def main():
+    print("AI Code Reviewer starting...\n Waiting for pull request...\n")
 
-diff = read_diff()
+    diff = read_diff()
 
-if diff:
-    review = ai_review(diff)
-    formatted_review = format_review(review)
-    print(formatted_review)
-    post_comment(formatted_review)
+    if diff:
+        review = ai_review(diff)
+        formatted_review = format_review(review)
+        print(formatted_review)
+        post_comment(formatted_review)
+    else:
+        print("No changes found")
 
-else:
-    print("No changes found")
+
+if __name__ == "__main__":
+    main()
