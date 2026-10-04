@@ -8,10 +8,10 @@ from reviewer.models import Review
 
 load_dotenv()
 
-client = OpenAI()
-
 
 def ai_review(code) -> Review:
+    client = OpenAI()
+
     prompt = f"""
 You are a code reviewer.
 

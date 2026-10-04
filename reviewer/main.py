@@ -26,15 +26,19 @@ def read_diff():
 
     return response.text
 
-print("AI Code Reviewer starting...\n Waiting for pull request...\n")
+def main():
+    print("AI Code Reviewer starting...\n Waiting for pull request...\n")
 
-diff = read_diff()
+    diff = read_diff()
 
-if diff:
-    review = ai_review(diff)
-    formatted_review = format_review(review)
-    print(formatted_review)
-    post_comment(formatted_review)
+    if diff:
+        review = ai_review(diff)
+        formatted_review = format_review(review)
+        print(formatted_review)
+        post_comment(formatted_review)
+    else:
+        print("No changes found")
 
-else:
-    print("No changes found")
+
+if __name__ == "__main__":
+    main()
