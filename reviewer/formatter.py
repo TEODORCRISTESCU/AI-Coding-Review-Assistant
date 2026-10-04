@@ -3,6 +3,7 @@ from reviewer.models import Review
 
 def format_review(review: Review) -> str:
     lines  = [
+        "<!-- ai-code-review -->"
         "## AI Code Review",
         "",
         review.summary,
