@@ -26,5 +26,10 @@ def post_comment(markdown: str) -> None:
         headers=headers,
         json=payload,
     )
+
+    if not response.ok:
+        raise RuntimeError(
+        f"GitHub comment failed ({response.status_code}): {response.text}"
+        )
     
     response.raise_for_status()
