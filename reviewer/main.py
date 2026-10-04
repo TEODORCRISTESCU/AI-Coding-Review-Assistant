@@ -1,23 +1,30 @@
 import subprocess
+import os
+import requests
 
 from reviewer.formatter import format_review
 from reviewer.github import post_comment
 from .ai_review import ai_review
 
-from logging import Logger
-
 def read_diff():
-    result = subprocess.run(
-        ["git", "diff", "origin/main...HEAD"],
-        text=True,
-        capture_output=True
+    token = os.environ["GITHUB_TOKEN"]
+    repository = os.environ["GITHUB_REPOSITORY"]
+    pull_number = os.environ["PR_NUMBER"]
+
+    url = (
+        f"https://api.github.com/repos/"
+        f"{repository}/pulls/{pull_number}"
     )
 
-    if result.returncode != 0:
-        raise RuntimeError(f"Git diff failed: {result.stderr.strip()}")
-    
-    return result.stdout
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github.diff",
+    }
 
+    response = requests.get(url, headers=headers, timeout=30)
+    response.raise_for_status()
+
+    return response.text
 
 print("AI Code Reviewer starting...\n Waiting for pull request...\n")
 

@@ -1,13 +1,12 @@
 name: AI Coding Review
 
 on:
-  pull_request:
+  pull_request_target:
     types: [opened, synchronize, reopened]
 
 permissions:
   contents: read
   issues: write
-  pull-requests: write
 
 jobs:
   review:
@@ -18,7 +17,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-
+          ref: main
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -29,13 +28,6 @@ jobs:
 
       - name: Run tests
         run: python -m pytest -q
-
-      - name: Inspect Git state
-        run: |
-          git status
-          git branch -a
-          git log --oneline --decorate -5
-          git diff --stat origin/main...HEAD
 
       - name: Run AI Reviewer
         run: python -m reviewer.main
