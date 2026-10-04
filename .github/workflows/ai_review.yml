@@ -32,6 +32,13 @@ jobs:
 
       - name: Run AI Reviewer
         run: python -m reviewer.main
+
+      - name: Inspect Git state
+          run: |
+            git status
+            git branch -a
+            git log --oneline --decorate -5
+            git diff --stat origin/main...HEAD
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           GITHUB_TOKEN: ${{ github.token }}
