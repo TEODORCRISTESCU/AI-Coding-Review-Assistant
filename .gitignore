@@ -1,2 +1,4 @@
 .venv/
 .env
+.tests/pycache/
+.reviewer/pycache
