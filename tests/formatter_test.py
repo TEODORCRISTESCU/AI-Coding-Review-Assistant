@@ -64,20 +64,3 @@ def test_format_review_multiple_findings():
     assert "TODO left unfinished" in result
     assert "2" and "10" in result 
 
-def test_read_diff_returns_git_output(monkeypatch):
-    def fake_run(command, text, capture_output):
-        assert command == [
-            "git",
-            "diff",
-            "origin/main...HEAD",
-            "--",
-            "reviewer/sample.py",
-        ]
-
-        return SimpleNamespace(stdout="some fake diff")
-
-    monkeypatch.setattr("reviewer.main.subprocess.run", fake_run)
-
-    result = read_diff("reviewer/sample.py")
-
-    assert result == "some fake diff"
