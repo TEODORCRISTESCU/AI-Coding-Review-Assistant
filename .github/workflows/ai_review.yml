@@ -1,7 +1,7 @@
 name: AI Coding Review
 
 on:
-  pull_request_target:
+  pull-request_target:
     types: [opened, synchronize, reopened]
 
 permissions:
