@@ -27,6 +27,9 @@ jobs:
       - name: Install dependencies
         run: python -m pip install -r requirements.txt
 
+      -name: Run tests
+        run: python -m pytest -q
+
       - name: Run AI Reviewer
         run: python -m reviewer.main
         env:
@@ -34,3 +37,5 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           GITHUB_REPOSITORY: ${{ github.repository }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
+
+        

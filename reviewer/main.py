@@ -4,19 +4,24 @@ from reviewer.formatter import format_review
 from reviewer.github import post_comment
 from .ai_review import ai_review
 
-def read_diff(filename):
+from logging import Logger
+
+def read_diff():
     result = subprocess.run(
-        ["git", "diff", "origin/main...HEAD", "--", filename],
+        ["git", "diff", "origin/main...HEAD"],
         text=True,
         capture_output=True
     )
 
+    if result.returncode != 0:
+        raise RuntimeError(f"Git diff failed: {result.stderr.strip()}")
+    
     return result.stdout
 
 
 print("AI Code Reviewer starting...\n Waiting for pull request...\n")
 
-diff = read_diff("reviewer/sample.py")
+diff = read_diff()
 
 if diff:
     review = ai_review(diff)
