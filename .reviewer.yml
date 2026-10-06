@@ -1,0 +1,4 @@
+max_diff_chars: 50000
+ignored_paths:
+  - "package-lock.json"
+  - "*.lock"

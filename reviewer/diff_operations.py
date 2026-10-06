@@ -1,4 +1,5 @@
 import re
+from fnmatch import fnmatchcase
 
 
 _HUNK_HEADER = re.compile(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,\d+)? @@")
@@ -41,3 +42,36 @@ def diff_parser(diff: str) -> dict[str, set[int]]:
             new_line_number += 1
 
     return added_lines
+
+def filter_diff(diff: str, ignored_paths: list[str]) -> str:
+    kept_sections = []
+
+    sections = diff.split("diff --git ")
+
+    for section in sections[1:]:
+        section = "diff --git " + section
+        file_path = None
+
+        for line in section.splitlines():
+            if line.startswith("@@ "):
+                break
+
+            if line.startswith("+++ b/"):
+                file_path = line[6:]
+                break
+
+            if line == "+++ /dev/null":
+                # Deleted file: use its old path.
+                for old_line in section.splitlines():
+                    if old_line.startswith("--- a/"):
+                        file_path = old_line[6:]
+                        break
+                break
+
+        if file_path is None or not any(
+            fnmatchcase(file_path, pattern)
+            for pattern in ignored_paths
+        ):
+            kept_sections.append(section)
+
+    return "".join(kept_sections)

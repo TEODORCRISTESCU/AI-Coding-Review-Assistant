@@ -4,10 +4,12 @@ import sys
 from json import JSONDecodeError
 from openai import OpenAIError
 from pydantic import ValidationError
-from reviewer.diff_parser import diff_parser
 from reviewer.formatter import format_review
 from reviewer.github import post_comment
 from .ai_review import ai_review
+from reviewer.config import load_config
+from reviewer.diff_operations import diff_parser, filter_diff
+import yaml
 
 def read_diff():
     token = os.environ["GITHUB_TOKEN"]
@@ -30,9 +32,33 @@ def read_diff():
     return response.text
 
 def main():
+    config = load_config()
+    print(config.max_diff_chars)
+    print(config.ignored_paths)
+
     print("AI Code Reviewer starting...\n Waiting for pull request...\n")
 
     diff = read_diff()
+
+    config = load_config()
+
+    if not diff:
+        print("No changes found")
+        return
+
+    diff = filter_diff(diff, config.ignored_paths)
+
+    if not diff.strip():
+        post_comment("Review skipped: no eligible changes to review.")
+        return
+
+    if len(diff) > config.max_diff_chars:
+        post_comment(
+            "Review skipped: diff exceeds the configured size limit "
+            f"({len(diff)} > {config.max_diff_chars} characters)."
+        )
+        return
+
 
     if diff:
         review = ai_review(diff)
@@ -57,7 +83,6 @@ def main():
         review.findings = valid_findings
 
         if rejected_count:
-        # Replace the original summary because it may describe rejected findings.
             review.summary = (
              f"Review incomplete: {rejected_count} finding(s) had invalid "
                 "locations and were excluded. Remaining findings are shown below."
@@ -97,7 +122,7 @@ if __name__ == "__main__":
         sys.exit(1)
     except ValidationError:
         print(
-            "Review failed: AI response did not match the schema.",
+            "Review failed: configuration or AI response failed validation.",
             file=sys.stderr,
         )
         sys.exit(1)
@@ -105,5 +130,17 @@ if __name__ == "__main__":
         print(
             "Review failed: operation could not be completed.",
             file=sys.stderr,
+        )
+        sys.exit(1)
+    except yaml.YAMLError:
+        print(
+        "Review failed: invalid YAML in .reviewer.yml.",
+        file=sys.stderr,
+        )
+        sys.exit(1)
+    except OSError:
+        print(
+        "Review failed: could not read the configuration file.",
+        file=sys.stderr,
         )
         sys.exit(1)
