@@ -31,8 +31,10 @@ An AI-powered code review assistant that analyzes GitHub pull-request diffs and 
 │   ├── main.py
 │   └── models.py
 ├── tests/
-│   ├── test_formatter.py
-│   └── test_github.py
+│   ├── formatter_test.py
+│   ├── github_tests.py
+│   └── main_tests.py
+├── pytest.ini
 ├── requirements.txt
 ├── .env.example
 └── README.md
@@ -59,6 +61,12 @@ Validated findings are submitted as one inline review
 ```
 
 The workflow treats pull-request code as untrusted data. It does not check out or execute the pull-request branch while secrets are available.
+
+Before analysis, the reviewer captures the PR head SHA and fetches the diff
+through the API. It checks the SHA again before publishing; if the PR changed,
+the review is skipped as stale. The workflow checks out trusted `main` code and
+uses per-PR concurrency with `cancel-in-progress: false` so overlapping runs do
+not cancel one another.
 
 ## Requirements
 
@@ -169,7 +177,7 @@ The workflow should:
 - avoid printing API keys or tokens;
 - use the minimum required GitHub permissions;
 - limit the size of submitted diffs;
-- avoid sending secrets or unrelated repository files to the AI model.
+- avoid sending secrets or unrelated repository files to the AI model;
 - read the PR diff and head SHA through the GitHub API without checking out or
   executing PR-branch code;
 - verify that the head SHA is unchanged before publishing feedback.
