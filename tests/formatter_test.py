@@ -12,6 +12,7 @@ def test_format_review_includes_summary_and_findings():
                 severity="high",
                 message="Move the password to an environment variable.",
                 line=4,
+                file_path="reviewer/sample.py",
             )
         ],
     )
@@ -43,13 +44,15 @@ def test_format_review_multiple_findings():
             Finding(
                 severity = "high",
                 message = "Move password to an environment variable",
-                line = 2
+                line = 2,
+                file_path = "reviewer/sample.py",
             ),
 
             Finding(
                 severity = "low",
                 message = "Finish TODO or delete it if not neccessary anymore",
-                line = 10
+                line = 10,
+                file_path = "reviewer/main.py",
             )
         ]
     )
@@ -63,4 +66,3 @@ def test_format_review_multiple_findings():
     assert "Hard-coded password found." in result
     assert "TODO left unfinished" in result
     assert "2" and "10" in result 
-

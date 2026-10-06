@@ -16,6 +16,7 @@ def format_review(review: Review) -> str:
         lines.append(f"**Severity:** {finding.severity.upper()}")
         lines.append(f"**Message:** {finding.message}")
         lines.append(f"**Line:** {finding.line}")
+        lines.append(f"**Location:** `{finding.file_path}:{finding.line}`")
         lines.append("")
 
     return "\n".join(lines)
