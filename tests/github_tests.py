@@ -131,7 +131,10 @@ def test_inline_review_payload_and_locations(monkeypatch):
             "side": "RIGHT",
             "body": (
                 "**HIGH:** This can fail for an empty list.\n\n"
-                "**Suggested fix:** Return an error before dividing by the list length."
+                "**Suggested fix:**\n\n"
+                "```text\n"
+                "Return an error before dividing by the list length.\n"
+                "```"
             ),
         }
     ]

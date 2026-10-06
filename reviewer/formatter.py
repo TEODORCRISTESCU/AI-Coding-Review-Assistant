@@ -1,6 +1,23 @@
 from reviewer.models import Review
 
 
+def format_suggestion(suggestion: str) -> str:
+    """Render AI-generated fix guidance without losing its line breaks."""
+    fence = "```"
+    while fence in suggestion:
+        fence += "`"
+
+    return "\n".join(
+        [
+            "**Suggested fix:**",
+            "",
+            f"{fence}text",
+            suggestion,
+            fence,
+        ]
+    )
+
+
 def format_review(review: Review) -> str:
     lines  = [
         "<!-- ai-code-review -->",
@@ -17,7 +34,7 @@ def format_review(review: Review) -> str:
         lines.append(f"**Message:** {finding.message}")
         lines.append(f"**Line:** {finding.line}")
         lines.append(f"**Location:** `{finding.file_path}:{finding.line}`")
-        lines.append(f"**Suggested fix:** {finding.suggestion}")
+        lines.extend(format_suggestion(finding.suggestion).splitlines())
         lines.append("")
 
     return "\n".join(lines)

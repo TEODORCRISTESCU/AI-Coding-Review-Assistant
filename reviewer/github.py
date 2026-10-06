@@ -1,6 +1,7 @@
 import os
 
 import requests
+from reviewer.formatter import format_suggestion
 from reviewer.models import Review
 
 REVIEW_MARKER = "<!-- ai-code-review -->"
@@ -105,7 +106,7 @@ def build_inline_comments(review: Review) -> list[dict]:
             "side": "RIGHT",
             "body": (
                 f"**{finding.severity.upper()}:** {finding.message}\n\n"
-                f"**Suggested fix:** {finding.suggestion}"
+                f"{format_suggestion(finding.suggestion)}"
             ),
         }
         for finding in review.findings

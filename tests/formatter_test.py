@@ -24,6 +24,28 @@ def test_format_review_includes_summary_and_findings():
     assert "Hard-coded password found." in result
     assert "Move the password to an environment variable." in result
     assert "4" in result
+    assert "**Suggested fix:**" in result
+    assert "```text" in result
+
+
+def test_format_review_preserves_multiline_suggestions():
+    review = Review(
+        summary="Potential error.",
+        findings=[
+            Finding(
+                severity="medium",
+                message="Empty input is not handled.",
+                line=8,
+                file_path="reviewer/sample.py",
+                suggestion='if not numbers:\n    raise ValueError("numbers must not be empty")',
+            )
+        ],
+    )
+
+    result = format_review(review)
+
+    assert "**Suggested fix:**\n\n```text" in result
+    assert 'if not numbers:\n    raise ValueError("numbers must not be empty")' in result
 
 def test_format_review_no_findings():
     review = Review(
