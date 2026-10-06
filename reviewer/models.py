@@ -6,6 +6,7 @@ class Finding(BaseModel):
     message: str = Field(min_length=1)
     line: int = Field(gt=0)
     file_path: str = Field(min_length=1)
+    suggestion: str = Field(min_length=1)
 
 
 class Review(BaseModel):

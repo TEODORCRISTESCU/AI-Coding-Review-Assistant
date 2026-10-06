@@ -13,6 +13,7 @@ def test_format_review_includes_summary_and_findings():
                 message="Move the password to an environment variable.",
                 line=4,
                 file_path="reviewer/sample.py",
+                suggestion="Read the password from an environment variable.",
             )
         ],
     )
@@ -26,7 +27,7 @@ def test_format_review_includes_summary_and_findings():
 
 def test_format_review_no_findings():
     review = Review(
-        summary = "No issues found",
+        summary = "No issues found. Check for an empty list",
         findings = []
 
     )
@@ -34,6 +35,7 @@ def test_format_review_no_findings():
     result = format_review(review)
 
     assert "No issues found" in result
+    assert "Check for an empty list" in result
     assert "Finding 1" not in result
 
 def test_format_review_multiple_findings():
@@ -46,6 +48,7 @@ def test_format_review_multiple_findings():
                 message = "Move password to an environment variable",
                 line = 2,
                 file_path = "reviewer/sample.py",
+                suggestion = "Read the password from an environment variable",
             ),
 
             Finding(
@@ -53,6 +56,7 @@ def test_format_review_multiple_findings():
                 message = "Finish TODO or delete it if not neccessary anymore",
                 line = 10,
                 file_path = "reviewer/main.py",
+                suggestion = "Finish the TODO or remove the dead code",
             )
         ]
     )

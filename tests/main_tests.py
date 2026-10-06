@@ -18,6 +18,7 @@ def make_finding(line=3, file_path="calculator.py"):
         message="An empty list causes division by zero.",
         line=line,
         file_path=file_path,
+        suggestion="Return early or raise a clear error when numbers is empty.",
     )
 
 
@@ -27,6 +28,7 @@ def run_pipeline(monkeypatch, review):
     posted_comments = []
 
     monkeypatch.setattr(reviewer_main, "read_diff", lambda: DIFF)
+    monkeypatch.setattr(reviewer_main, "get_pr_head_sha", lambda: "sha-1")
     monkeypatch.setattr(reviewer_main, "ai_review", lambda diff: review)
 
     def fake_format_review(filtered_review):
@@ -38,6 +40,9 @@ def run_pipeline(monkeypatch, review):
     )
     monkeypatch.setattr(
         reviewer_main, "post_comment", posted_comments.append
+    )
+    monkeypatch.setattr(
+        reviewer_main, "post_inline_review", lambda review, commit_sha: None
     )
 
     reviewer_main.main()
@@ -113,6 +118,7 @@ def test_preserves_review_with_no_findings(monkeypatch):
 
 
 def test_empty_diff_skips_review_and_posting(monkeypatch, capsys):
+    monkeypatch.setattr(reviewer_main, "get_pr_head_sha", lambda: "sha-1")
     monkeypatch.setattr(reviewer_main, "read_diff", lambda: "")
 
     def unexpected_call(*args, **kwargs):
@@ -120,7 +126,52 @@ def test_empty_diff_skips_review_and_posting(monkeypatch, capsys):
 
     monkeypatch.setattr(reviewer_main, "ai_review", unexpected_call)
     monkeypatch.setattr(reviewer_main, "post_comment", unexpected_call)
+    monkeypatch.setattr(reviewer_main, "post_inline_review", unexpected_call)
 
     reviewer_main.main()
 
     assert "No changes found" in capsys.readouterr().out
+
+
+def test_changed_head_after_diff_skips_publication(monkeypatch):
+    monkeypatch.setattr(reviewer_main, "read_diff", lambda: DIFF)
+    head_shas = iter(["sha-before", "sha-after"])
+    monkeypatch.setattr(
+        reviewer_main, "get_pr_head_sha", lambda: next(head_shas)
+    )
+    monkeypatch.setattr(
+        reviewer_main,
+        "ai_review",
+        lambda diff: (_ for _ in ()).throw(
+            AssertionError("OpenAI should not run for a stale diff")
+        ),
+    )
+    published = []
+    monkeypatch.setattr(reviewer_main, "post_comment", published.append)
+    monkeypatch.setattr(
+        reviewer_main, "post_inline_review", lambda *args: published.append(args)
+    )
+
+    reviewer_main.main()
+
+    assert published == []
+
+
+def test_changed_head_during_analysis_skips_publication(monkeypatch):
+    finding = make_finding()
+    review = Review(summary="Potential division by zero.", findings=[finding])
+    head_shas = iter(["sha-1", "sha-1", "sha-2"])
+    monkeypatch.setattr(
+        reviewer_main, "get_pr_head_sha", lambda: next(head_shas)
+    )
+    monkeypatch.setattr(reviewer_main, "read_diff", lambda: DIFF)
+    monkeypatch.setattr(reviewer_main, "ai_review", lambda diff: review)
+    published = []
+    monkeypatch.setattr(reviewer_main, "post_comment", published.append)
+    monkeypatch.setattr(
+        reviewer_main, "post_inline_review", lambda *args: published.append(args)
+    )
+
+    reviewer_main.main()
+
+    assert published == []

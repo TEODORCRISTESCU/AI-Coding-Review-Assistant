@@ -3,7 +3,7 @@ from reviewer.models import Review
 
 def format_review(review: Review) -> str:
     lines  = [
-        "<!-- ai-code-review -->"
+        "<!-- ai-code-review -->",
         "## AI Code Review",
         "",
         review.summary,
@@ -17,6 +17,7 @@ def format_review(review: Review) -> str:
         lines.append(f"**Message:** {finding.message}")
         lines.append(f"**Line:** {finding.line}")
         lines.append(f"**Location:** `{finding.file_path}:{finding.line}`")
+        lines.append(f"**Suggested fix:** {finding.suggestion}")
         lines.append("")
 
     return "\n".join(lines)

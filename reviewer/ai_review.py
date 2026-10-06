@@ -28,7 +28,8 @@ Use exactly this structure:
       "severity": "low, medium, or high",
       "message": "clear explanation",
       "line": 1,
-      "file_path": "reviewer/sample.py
+      "file_path": "reviewer/sample.py",
+      "suggestion": "concrete, actionable fix guidance"
     }}
   ]
 }}
@@ -37,6 +38,7 @@ Severity must be exactly "low", "medium", or "high".
 file_path must identify the changed file using its repository-relative path.
 line must be the line number in the updated file, not its position in the diff.
 Report findings only on added lines.
+For every finding, provide a concrete suggested fix that a developer can apply.
 If no issues are found, return an empty findings list
 """
 

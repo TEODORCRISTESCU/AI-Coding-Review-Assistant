@@ -38,8 +38,12 @@ def setup_pipeline(monkeypatch, diff, config):
 
     monkeypatch.setattr(reviewer_main, "load_config", lambda: config)
     monkeypatch.setattr(reviewer_main, "read_diff", lambda: diff)
+    monkeypatch.setattr(reviewer_main, "get_pr_head_sha", lambda: "sha-1")
     monkeypatch.setattr(
         reviewer_main, "post_comment", posted_comments.append
+    )
+    monkeypatch.setattr(
+        reviewer_main, "post_inline_review", lambda review, commit_sha: None
     )
 
     return posted_comments

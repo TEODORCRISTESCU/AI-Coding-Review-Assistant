@@ -5,7 +5,12 @@ from json import JSONDecodeError
 from openai import OpenAIError
 from pydantic import ValidationError
 from reviewer.formatter import format_review
-from reviewer.github import post_comment
+from reviewer.github import (
+    get_pr_head_sha,
+    post_comment,
+    post_inline_review,
+)
+
 from .ai_review import ai_review
 from reviewer.config import load_config
 from reviewer.diff_operations import diff_parser, filter_diff
@@ -33,14 +38,15 @@ def read_diff():
 
 def main():
     config = load_config()
-    print(config.max_diff_chars)
-    print(config.ignored_paths)
 
     print("AI Code Reviewer starting...\n Waiting for pull request...\n")
 
+    commit_sha = get_pr_head_sha()
     diff = read_diff()
 
-    config = load_config()
+    if get_pr_head_sha() != commit_sha:
+        print("Review skipped: the PR changed while fetching the diff.")
+        return
 
     if not diff:
         print("No changes found")
@@ -60,43 +66,43 @@ def main():
         return
 
 
-    if diff:
-        review = ai_review(diff)
-        parser_res = diff_parser(diff)
-        valid_findings = []
+    review = ai_review(diff)
+    parser_res = diff_parser(diff)
+    valid_findings = []
 
-        for finding in review.findings:
+    for finding in review.findings:
 
-            valid_lines = parser_res.get(finding.file_path, set())
-            
-            if finding.line in valid_lines:
-                valid_findings.append(finding)
+        valid_lines = parser_res.get(finding.file_path, set())
 
-            else:
-                print(
+        if finding.line in valid_lines:
+            valid_findings.append(finding)
+
+        else:
+            print(
                 f"Rejected invalid location: "
                 f"{finding.file_path}:{finding.line}"
             )
 
-        
-        rejected_count = len(review.findings) - len(valid_findings)
-        review.findings = valid_findings
+    rejected_count = len(review.findings) - len(valid_findings)
+    review.findings = valid_findings
 
-        if rejected_count:
-            review.summary = (
-             f"Review incomplete: {rejected_count} finding(s) had invalid "
-                "locations and were excluded. Remaining findings are shown below."
+    if rejected_count:
+        review.summary = (
+            f"Review incomplete: {rejected_count} finding(s) had invalid "
+            "locations and were excluded. Remaining findings are shown below."
             if valid_findings
             else "Review incomplete: all findings had invalid locations "
-                 "and were excluded."
+            "and were excluded."
         )
 
-        formatted_review = format_review(review)
-        print(formatted_review)
-        post_comment(formatted_review)
+    if get_pr_head_sha() != commit_sha:
+        print("Review skipped: the PR changed during analysis.")
+        return
 
-    else:
-        print("No changes found")
+    formatted_review = format_review(review)
+    print(formatted_review)
+    post_comment(formatted_review)
+    post_inline_review(review, commit_sha)
 
 
 if __name__ == "__main__":
