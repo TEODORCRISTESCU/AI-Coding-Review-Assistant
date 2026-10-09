@@ -114,9 +114,9 @@ if __name__ == "__main__":
             file=sys.stderr,
         )
         sys.exit(1)
-    except OpenAIError:
+    except OpenAIError as e:
         print(
-            "Review failed: OpenAI request failed.",
+            f"Review failed: OpenAI request failed, with error {e}",
             file=sys.stderr,
         )
         sys.exit(1)
