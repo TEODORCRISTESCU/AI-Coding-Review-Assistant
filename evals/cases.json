@@ -1,0 +1,17 @@
+[
+  {"id": "bug_sql_concat", "fixture": "diffs/bug_sql_concat.diff", "kind": "bug", "expected_bug": "SQL string concatenation"},
+  {"id": "bug_password", "fixture": "diffs/bug_password.diff", "kind": "bug", "expected_bug": "hardcoded demo password"},
+  {"id": "bug_off_by_one", "fixture": "diffs/bug_off_by_one.diff", "kind": "bug", "expected_bug": "off-by-one loop"},
+  {"id": "bug_unused_variable", "fixture": "diffs/bug_unused_variable.diff", "kind": "bug", "expected_bug": "unused variable"},
+  {"id": "bug_missing_error", "fixture": "diffs/bug_missing_error.diff", "kind": "bug", "expected_bug": "missing empty-input guard"},
+  {"id": "bug_broad_except", "fixture": "diffs/bug_broad_except.diff", "kind": "bug", "expected_bug": "overly broad exception"},
+  {"id": "bug_mutable_default", "fixture": "diffs/bug_mutable_default.diff", "kind": "bug", "expected_bug": "mutable default argument"},
+  {"id": "bug_path_traversal", "fixture": "diffs/bug_path_traversal.diff", "kind": "bug", "expected_bug": "unsanitized file path"},
+  {"id": "bug_missing_timeout", "fixture": "diffs/bug_missing_timeout.diff", "kind": "bug", "expected_bug": "HTTP request without timeout"},
+  {"id": "bug_unescaped_html", "fixture": "diffs/bug_unescaped_html.diff", "kind": "bug", "expected_bug": "unescaped HTML output"},
+  {"id": "clean_parameterized_sql", "fixture": "diffs/clean_parameterized_sql.diff", "kind": "clean", "expected_bug": null},
+  {"id": "clean_bounded_loop", "fixture": "diffs/clean_bounded_loop.diff", "kind": "clean", "expected_bug": null},
+  {"id": "clean_specific_exception", "fixture": "diffs/clean_specific_exception.diff", "kind": "clean", "expected_bug": null},
+  {"id": "clean_timeout", "fixture": "diffs/clean_timeout.diff", "kind": "clean", "expected_bug": null},
+  {"id": "clean_env_secret", "fixture": "diffs/clean_env_secret.diff", "kind": "clean", "expected_bug": null}
+]

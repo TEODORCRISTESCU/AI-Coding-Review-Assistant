@@ -1,0 +1,8 @@
+diff --git a/app/items.py b/app/items.py
+--- a/app/items.py
++++ b/app/items.py
+@@ -1,2 +1,3 @@
+ def process_all(items):
+-    return []
++    for item in items:
++        process(item)

@@ -1,0 +1,7 @@
+diff --git a/app/files.py b/app/files.py
+--- a/app/files.py
++++ b/app/files.py
+@@ -1,2 +1,2 @@
+ def read_file(name):
+-    return ""
++    return open("/srv/uploads/" + name).read()

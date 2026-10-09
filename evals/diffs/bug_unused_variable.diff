@@ -1,0 +1,8 @@
+diff --git a/app/labels.py b/app/labels.py
+--- a/app/labels.py
++++ b/app/labels.py
+@@ -1,2 +1,3 @@
+ def label(item):
+-    return item.name
++    unused_label = item.name.upper()
++    return item.name

@@ -1,0 +1,7 @@
+diff --git a/app/web.py b/app/web.py
+--- a/app/web.py
++++ b/app/web.py
+@@ -1,2 +1,2 @@
+ def render(name):
+-    return ""
++    return "<h1>" + name + "</h1>"

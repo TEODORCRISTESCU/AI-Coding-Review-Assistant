@@ -1,6 +1,10 @@
 # AI Code Review Assistant
 
-An AI-powered code review assistant that analyzes GitHub pull-request diffs and posts review feedback automatically.
+![CI](https://github.com/TEODORCRISTESCU/AI-Coding-Review-Assistant/actions/workflows/ci.yml/badge.svg)
+
+Automated PR reviewer that posts severity-ranked, line-level findings with fix suggestions.
+
+AI-generated findings may be wrong. Every review needs human verification before code is changed or merged.
 
 ## Features
 
@@ -14,7 +18,7 @@ An AI-powered code review assistant that analyzes GitHub pull-request diffs and 
 - Creates or updates a single review comment on the pull request.
 - Prevents duplicate inline reviews for the same commit with a dedicated marker.
 - Runs automated tests with pytest.
-- Uses GitHub Actions for CI automation.
+- Uses separate test-only and live-review GitHub Actions workflows.
 
 ## Project structure
 
@@ -22,7 +26,16 @@ An AI-powered code review assistant that analyzes GitHub pull-request diffs and 
 .
 ├── .github/
 │   └── workflows/
-│       └── ai_review.yml
+│       ├── ai_review.yml
+│       └── ci.yml
+├── docs/
+│   ├── demo_seeded_bugs.py
+│   └── portfolio-release.md
+├── evals/
+│   ├── cases.json
+│   ├── diffs/
+│   ├── README.md
+│   └── run.py
 ├── reviewer/
 │   ├── __init__.py
 │   ├── ai_review.py
@@ -31,12 +44,14 @@ An AI-powered code review assistant that analyzes GitHub pull-request diffs and 
 │   ├── main.py
 │   └── models.py
 ├── tests/
-│   ├── formatter_test.py
-│   ├── github_tests.py
-│   └── main_tests.py
+│   ├── test_formatter.py
+│   ├── test_github.py
+│   └── test_main.py
 ├── pytest.ini
 ├── requirements.txt
 ├── .env.example
+├── .reviewer.yml
+├── LICENSE
 └── README.md
 ```
 
@@ -67,6 +82,24 @@ through the API. It checks the SHA again before publishing; if the PR changed,
 the review is skipped as stale. The workflow checks out trusted `main` code and
 uses per-PR concurrency with `cancel-in-progress: false` so overlapping runs do
 not cancel one another.
+
+## Design decisions
+
+- The main reviewer runs trusted code from `main` rather than executing code from the PR branch.
+- The PR head SHA is captured before analysis and checked again before publishing, so stale reviews are skipped.
+- A duplicate inline-review marker plus per-PR concurrency prevents repeated comments while allowing newer commits to be reviewed.
+- Every finding is validated against changed added-line locations before it is posted.
+
+## Configuration
+
+`.reviewer.yml` is optional. If it is absent, the defaults are:
+
+```yaml
+max_diff_chars: 50000
+ignored_paths: []
+```
+
+The checked-in configuration ignores `package-lock.json` and `*.lock`. `ignored_paths` accepts `fnmatch` patterns such as `"*.lock"` or `"dist/**"`. The size limit applies after ignored files are removed. Ignored file sections are removed before the remaining diff is sent for AI analysis.
 
 ## Requirements
 
@@ -125,6 +158,22 @@ python -m pytest -q
 
 The tests mock external services, including all GitHub and OpenAI calls, so they
 do not send real requests or require credentials.
+
+## Example
+
+An illustrative finding might look like this:
+
+```text
+HIGH — SQL is built by concatenating request data.
+Suggested fix: use a parameterized query and pass the value separately.
+Location: app/db.py:18
+```
+
+This is an example format, not a claim about a live demo, screenshot, or measured accuracy result.
+
+## Evaluation harness
+
+The synthetic harness contains ten seeded buggy diffs and five clean controls. See [`evals/README.md`](evals/README.md) for manual judging instructions. It is not production-accuracy evidence.
 
 ## GitHub Actions setup
 
@@ -192,17 +241,21 @@ The workflow should:
   `github-actions[bot]` containing the inline marker and matching commit SHA.
 - Language-specific static analysis is not yet integrated.
 - The workflow requires access to the OpenAI API.
+- The reviewer sees the submitted diff, not repository-wide context or the full history of a change.
+- There is no production accuracy measurement in this repository.
+- Sensitive content present in a diff is sent to the configured model.
 
 ## Planned improvements
 
-- Add configurable ignored paths.
-- Add maximum diff and file-size limits.
-- Add deterministic tools such as Ruff, Bandit, and Gitleaks.
-- Add review configuration through `.reviewer.yml`.
-- Improve duplicate-comment handling.
-- Add evaluation cases for measuring false positives and false negatives.
-- Add support for multiple programming languages.
+- Add deterministic static-analysis integrations.
+- Add richer repository-aware context with explicit privacy controls.
+- Add automated regression reporting for manually judged evaluation runs.
+- Support additional review providers and model configurations.
 
 ## Disclaimer
 
-This project is intended for learning and experimentation. AI-generated code reviews should be treated as suggestions and verified by a human reviewer.
+AI-generated code reviews are suggestions and must be verified by a human reviewer.
+
+## Demo preparation
+
+Follow [`docs/portfolio-release.md`](docs/portfolio-release.md) to create a real demo PR yourself. The repository intentionally does not create GitHub content or screenshots automatically.

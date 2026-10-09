@@ -1,0 +1,7 @@
+diff --git a/app/tags.py b/app/tags.py
+--- a/app/tags.py
++++ b/app/tags.py
+@@ -1,2 +1,2 @@
+ def add_tag(tag, tags=[]):
+-    return tags
++    tags.append(tag)

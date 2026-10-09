@@ -1,4 +1,6 @@
 .venv/
 .env
-.tests/pycache/
-.reviewer/pycache
+__pycache__/
+*.py[cod]
+.pytest_cache/
+evals/results/
