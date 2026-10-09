@@ -259,3 +259,5 @@ AI-generated code reviews are suggestions and must be verified by a human review
 ## Demo preparation
 
 Follow [`docs/portfolio-release.md`](docs/portfolio-release.md) to create a real demo PR yourself. The repository intentionally does not create GitHub content or screenshots automatically.
+Also, you can find a proof of concept, i.e a picture of the test I did in the same directory, name code_review-demo.png
+
